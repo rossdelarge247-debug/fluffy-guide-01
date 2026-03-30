@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  displayName String?
+  bio         String?
+  password    String
+  createdAt   DateTime @default(now())
+
+  posts            Post[]
+  sentRequests     FriendRequest[] @relation("SentRequests")
+  receivedRequests FriendRequest[] @relation("ReceivedRequests")
+  friendshipsA     Friendship[]    @relation("FriendA")
+  friendshipsB     Friendship[]    @relation("FriendB")
+  createdPlans     Plan[]
+  planInvitations  PlanInvitee[]
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  mood      String?
+  createdAt DateTime @default(now())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model FriendRequest {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  createdAt  DateTime @default(now())
+  sender     User     @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userAId   String
+  userBId   String
+  createdAt DateTime @default(now())
+  userA     User     @relation("FriendA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB     User     @relation("FriendB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  @@unique([userAId, userBId])
+}
+
+model Plan {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  location    String?
+  date        DateTime
+  createdAt   DateTime    @default(now())
+  creatorId   String
+  creator     User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  invitees    PlanInvitee[]
+}
+
+model PlanInvitee {
+  id     String @id @default(cuid())
+  planId String
+  userId String
+  rsvp   String @default("PENDING")
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, userId])
+}
