@@ -5,11 +5,11 @@
   "scripts": {
     "dev": "prisma db push && next dev",
     "build": "prisma db push && next build",
-    "start": "prisma db push && next start",
+    "start": "next start",
     "lint": "next lint",
     "db:migrate": "prisma migrate dev --name init",
     "db:push": "prisma db push",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && prisma db push && next build"
   },
   "dependencies": {
     "next": "14.2.29",
