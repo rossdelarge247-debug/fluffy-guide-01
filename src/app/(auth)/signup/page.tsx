@@ -38,6 +38,9 @@ export default function SignupPage() {
       if (result?.ok) {
         router.push("/home");
         router.refresh();
+      } else {
+        // Account created but auto-login failed — send to login page
+        router.push("/login?registered=1");
       }
     } finally {
       setLoading(false);

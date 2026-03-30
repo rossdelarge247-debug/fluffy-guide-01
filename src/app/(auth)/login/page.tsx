@@ -1,10 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+
+function RegisteredBanner() {
+  const params = useSearchParams();
+  if (params.get("registered") !== "1") return null;
+  return (
+    <p className="mt-2 text-sm text-emerald-600 font-medium">
+      Account created! Sign in below.
+    </p>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,6 +61,9 @@ export default function LoginPage() {
           </Link>
           <h1 className="text-2xl font-bold text-stone-900">Welcome back</h1>
           <p className="text-stone-500 text-sm mt-1">Sign in to your account</p>
+          <Suspense>
+            <RegisteredBanner />
+          </Suspense>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
