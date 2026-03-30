@@ -46,7 +46,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ id: user.id, username: user.username }, { status: 201 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("[POST /api/users]", err);
+    const message = process.env.NODE_ENV === "development"
+      ? (err as Error).message
+      : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
