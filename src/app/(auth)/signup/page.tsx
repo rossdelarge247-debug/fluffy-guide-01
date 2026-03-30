@@ -11,12 +11,12 @@ export default function SignupPage() {
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{ message: string; type?: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    setError(null);
     setLoading(true);
     try {
       const res = await fetch("/api/users", {
@@ -26,7 +26,7 @@ export default function SignupPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong");
+        setError({ message: data.error ?? "Something went wrong", type: data.type });
         return;
       }
       // Auto-login after signup
@@ -100,7 +100,12 @@ export default function SignupPage() {
             required
           />
           {error && (
-            <p className="text-sm text-red-500 text-center">{error}</p>
+            <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">
+              <p className="font-medium">{error.message}</p>
+              {error.type && (
+                <p className="text-xs text-red-400 font-mono mt-1">{error.type}</p>
+              )}
+            </div>
           )}
           <Button type="submit" size="lg" className="w-full mt-2" loading={loading}>
             Create account
