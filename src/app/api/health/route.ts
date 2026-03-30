@@ -15,8 +15,13 @@ export async function GET() {
   try {
     const userCount = await prisma.user.count();
     checks.database = `OK (${userCount} users)`;
+    // Also verify write access
+    await prisma.$executeRaw`SELECT 1`;
+    checks.databaseWrite = "OK";
   } catch (e) {
-    checks.database = `ERROR: ${(e as Error).message}`;
+    const msg = (e as Error).message;
+    checks.database = `ERROR: ${msg}`;
+    checks.databaseWrite = `ERROR: ${msg}`;
   }
 
   const allOk = !Object.values(checks).some((v) => v.includes("ERROR") || v.includes("MISSING"));
